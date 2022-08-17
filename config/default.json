@@ -1,0 +1,8 @@
+{
+    "host" : "localhost",
+    "user" : "dev",
+    "pass" : "Bwe@12041996",
+    "db" : "dtalk",
+    "passSalt" : 12,
+    "secret" : "Sup3rS3cr3t"
+}
