@@ -21,7 +21,7 @@ class User{
     /**
      * Return User object
      * 
-     * @param id (int) - user ID 
+     * @param {number} id user ID 
      */
 
     static async getUser(id){
@@ -30,10 +30,10 @@ class User{
             if(res[0][0]){
                 return new this(res[0][0].id, res[0][0].nickname, res[0][0].avatar, res[0][0].email)
             }else{
-                return {status : "error", error_message: "User wasn't found"}
+                return new Error("User wasn't found")
             }
         }catch(e){
-            return {status : "error", error_message: `Server error: ${e.message}`}
+            return new Error(`Server error: ${e.message}`)
         }
         
     }
@@ -41,8 +41,8 @@ class User{
         /**
      * Return JWT 
      * 
-     * @param email (string) - user email
-     * @param pass (string) - user password 
+     * @param {string} email user email
+     * @param {string} pass user password 
      */
 
     static async login(email, pass){
@@ -54,39 +54,39 @@ class User{
                     const payload = {id: userFromDb[0][0].id, nickname: userFromDb[0][0].nickname, avatar: userFromDb[0][0].avatar}
                     return jwt.sign(payload, jwtSecret) 
                 }else{
-                    return {status : "error", error_message: "Wrong password"}
+                    return new Error("Wrong password")
                 }
             }else{
-                return {status : "error", error_message: "User wasn't found"}
+                return new Error("User wasn't found")
             }
         }catch(e){
-            return {status : "error", error_message: `Server error: ${e.message}`}
+            return new Error(`Server error: ${e.message}`)
         }
     }
 
     /**
      * Return json 
      * 
-     * @param email (string) - user email
-     * @param pass (string) - user password 
+     * @param {string} email user email
+     * @param {string} pass user password 
      */
 
     static async registration(email, pass){
         try{
             const userFromDb = await db.query(`SELECT * FROM user WHERE email = '${email}'`)
             if(userFromDb[0][0]){
-                return {status : "error", error_message: `User with email ${email} already exists`}
+                return new Error(`User with email ${email} already exists`)
             }else{
                 const passHash = bcrypt.hashSync(pass, passSalt)
                 try{
                     await db.query(`INSERT INTO user (email, pass) VALUES ('${email}', '${passHash}')`)
                     return {status: "succes", message: "User was created"}
                 }catch(e){
-                    return {status : "error", error_message: `MySQL error: ${e.message}`}
+                    return new Error(`MySQL error: ${e.message}`)
                 }
             }
         }catch(e){
-            return {status : "error", error_message: `Server error: ${e.message}`}
+            return new Error(`Server error: ${e.message}`)
         }
     }
 
@@ -95,23 +95,15 @@ class User{
     /**
      * Return json 
      * 
-     * @param file (object) - object File
+     * @param {File} file object File class
      */
 
     async setAvatar(file){
-        if(!file.id){
-            return {status : "error", error_message: `Error: error with file object`}
-        }
-        
         try{
-            const file = await db.query(`SELECT * FROM files WHERE id = '${file.id}' AND created_by = ${this._id}`)
-            if(!file[0][0]){
-                return {status : "error", error_message: `Error: No file in DB.`}
-            }
             await db.query(`UPDATE user SET avatar = ${file.id} WHERE id = ${this._id}`)
             return {status: "succes", message: "Avatar was changed"}
         }catch (e){
-            return {status : "error", error_message: `MySQL error: ${e.message}`}
+            return new Error(`MySQL error: ${e.message}`)
         }
     }
 }
