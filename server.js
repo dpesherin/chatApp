@@ -3,11 +3,12 @@ const cors = require('cors')
 const http = require('http')
 const db = require('./core/dbconn')
 const User = require('./src/User')
+const fileUpload = require('express-fileupload')
 
 const app = express()
 const server = http.createServer(app)
 
-
+app.use(fileUpload({createParentPath: true}))
 app.use(cors())
 
 server.listen(8000, async ()=>{
