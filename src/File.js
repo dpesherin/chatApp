@@ -24,7 +24,7 @@ class File{
      * 
      */
 
-    static async save(file, userID){
+    static async saveFile(file, userID){
 
         let path
         let type
@@ -61,6 +61,15 @@ class File{
             }
             
             
+    }
+
+    async delete(){
+        try{
+            await db.query(`DELETE FROM files * WHERE id = ${this._id}`);
+            return {status: "success", msg: "file was deleted"}
+        }catch(e){
+            return new Error(`MySQL Error: ${e.message}`)
+        }
     }
 
 
